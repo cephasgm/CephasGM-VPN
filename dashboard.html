@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – CephasGM VPN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="gradient-bg text-white font-sans min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold"><i class="fas fa-tachometer-alt text-blue-400"></i> VPN Dashboard</h1>
+            <button onclick="logout()" class="bg-red-600 px-4 py-2 rounded-lg text-sm">Logout</button>
+        </div>
+        <div class="glass-card rounded-2xl p-6 mb-6">
+            <h2 class="text-xl font-semibold">Your VPN Configurations</h2>
+            <div id="serversList" class="mt-4 space-y-3">
+                <p class="text-gray-400">Loading servers...</p>
+            </div>
+        </div>
+        <div id="configOutput" class="glass-card rounded-2xl p-6 hidden">
+            <h3 class="font-bold">WireGuard Config</h3>
+            <pre id="configText" class="bg-black/50 p-3 rounded text-sm overflow-auto mt-2"></pre>
+            <button onclick="downloadConfig()" class="mt-3 bg-blue-600 px-4 py-2 rounded">Download .conf</button>
+        </div>
+    </div>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+
+        async function fetchServers() {
+            try {
+                const res = await fetch('http://localhost:3000/api/vpn/servers', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const servers = await res.json();
+                const container = document.getElementById('serversList');
+                if (servers.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400">No servers available.</p>';
+                    return;
+                }
+                container.innerHTML = servers.map(s => `
+                    <div class="flex justify-between items-center bg-gray-800/50 p-4 rounded-lg">
+                        <div><strong>${s.name}</strong><br><span class="text-xs text-gray-400">${s.endpoint}</span></div>
+                        <button onclick="generateConfig(${s.id})" class="bg-green-600 px-4 py-2 rounded text-sm">Generate Config</button>
+                    </div>
+                `).join('');
+            } catch (err) {
+                document.getElementById('serversList').innerHTML = '<p class="text-red-400">Failed to load servers. Is backend running?</p>';
+            }
+        }
+
+        async function generateConfig(serverId) {
+            try {
+                const res = await fetch('http://localhost:3000/api/vpn/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ serverId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('configText').innerText = data.config;
+                    document.getElementById('configOutput').classList.remove('hidden');
+                    window.currentConfig = data.config;
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown'));
+                }
+            } catch (err) {
+                alert('Backend unreachable');
+            }
+        }
+
+        function downloadConfig() {
+            const blob = new Blob([window.currentConfig], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'vpn-config.conf';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'index.html';
+        }
+
+        fetchServers();
+    </script>
+</body>
+</html>

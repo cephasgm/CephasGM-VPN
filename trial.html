@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Free Trial – CephasGM VPN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="gradient-bg text-white font-sans min-h-screen flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-8 w-full max-w-md text-center">
+        <i class="fas fa-gift text-5xl text-green-400 mb-4"></i>
+        <h1 class="text-2xl font-bold">7‑Day Free Trial</h1>
+        <p class="text-gray-300 mt-2">No credit card required. Full access to all servers.</p>
+        <form id="trialForm" class="mt-6">
+            <input type="email" id="email" placeholder="Your email address" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:border-blue-500 mb-4" required>
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-semibold">Start My Trial</button>
+        </form>
+        <p class="text-xs text-gray-500 mt-4">By continuing you agree to our <a href="#" class="text-blue-400">Terms</a>.</p>
+        <div id="message" class="mt-4 text-sm hidden"></div>
+    </div>
+    <script>
+        document.getElementById('trialForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const msgDiv = document.getElementById('message');
+            // Simulate trial creation (in real app, call backend to create trial user)
+            // For demo, just redirect to subscription page with email
+            localStorage.setItem('trialEmail', email);
+            msgDiv.className = 'mt-4 text-sm text-green-400';
+            msgDiv.innerText = 'Trial account created! Redirecting to choose plan...';
+            setTimeout(() => { window.location.href = 'subscription.html'; }, 1500);
+        });
+    </script>
+</body>
+</html>

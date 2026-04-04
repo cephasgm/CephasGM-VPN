@@ -22,23 +22,23 @@
         <div class="grid md:grid-cols-2 gap-6">
             <div class="glass-card rounded-2xl p-6 plan-card" data-plan="monthly">
                 <h2 class="text-2xl font-bold">Monthly</h2>
-                <div class="text-4xl font-extrabold mt-2">$9.99<span class="text-lg">/mo</span></div>
+                <div class="text-4xl font-extrabold mt-2">$5.00<span class="text-lg">/mo</span></div>
                 <ul class="mt-4 space-y-2 text-sm">
                     <li><i class="fas fa-check text-green-400"></i> Unlimited bandwidth</li>
-                    <li><i class="fas fa-check text-green-400"></i> 5 devices</li>
+                    <li><i class="fas fa-check text-green-400"></i> Unlimited devices</li>
                     <li><i class="fas fa-check text-green-400"></i> All server locations</li>
                 </ul>
                 <button class="mt-6 w-full bg-blue-600 py-2 rounded-lg">Select Monthly</button>
             </div>
             <div class="glass-card rounded-2xl p-6 plan-card border border-blue-500" data-plan="yearly">
-                <div class="absolute -mt-8 ml-4 bg-blue-600 px-3 py-1 rounded-full text-xs">Save 40%</div>
+                <div class="absolute -mt-8 ml-4 bg-blue-600 px-3 py-1 rounded-full text-xs">Save 20%</div>
                 <h2 class="text-2xl font-bold">Yearly</h2>
-                <div class="text-4xl font-extrabold mt-2">$5.99<span class="text-lg">/mo</span></div>
-                <div class="text-sm text-gray-400">billed $71.88 annually</div>
+                <div class="text-4xl font-extrabold mt-2"> For Only $45.00<span class="text-lg">/yr</span></div>
+                <div class="text-sm text-gray-400">billed $45.00 annually</div>
                 <ul class="mt-4 space-y-2 text-sm">
                     <li><i class="fas fa-check text-green-400"></i> Everything in Monthly</li>
-                    <li><i class="fas fa-check text-green-400"></i> 10 devices</li>
-                    <li><i class="fas fa-check text-green-400"></i> Priority support</li>
+                    <li><i class="fas fa-check text-green-400"></i> Unlimited devices</li>
+                    <li><i class="fas fa-check text-green-400"></i> Priority support 24/7</li>
                 </ul>
                 <button class="mt-6 w-full bg-gradient-to-r from-blue-600 to-purple-600 py-2 rounded-lg">Select Yearly</button>
             </div>
@@ -48,14 +48,39 @@
         </div>
     </div>
     <script>
-        document.querySelectorAll('.plan-card button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const plan = btn.closest('.plan-card').dataset.plan;
-                localStorage.setItem('selectedPlan', plan);
-                window.location.href = 'payment.html';
-            });
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login first.');
+            window.location.href = 'login.html';
+        }
+
+        async function selectPlan(plan) {
+            try {
+                const res = await fetch('/api/auth/create-checkout', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ plan })
+                });
+                const data = await res.json();
+                if (res.ok && data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Network error: ' + err.message);
+            }
+        }
+
+        document.querySelectorAll('.plan-card').forEach(card => {
+            const plan = card.getAttribute('data-plan');
+            const btn = card.querySelector('button');
+            btn.addEventListener('click', () => selectPlan(plan));
         });
     </script>
 </body>
 </html>
-

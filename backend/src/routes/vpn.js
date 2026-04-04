@@ -63,4 +63,43 @@ router.post('/config', async (req, res, next) => {
   }
 });
 
+
+// Xray config endpoint
+router.get("/xray-config", async (req, res, next) => {
+  try {
+    const uuid = process.env.XRAY_UUID || "71226db2-b1b8-4d94-9791-623b5c0c7851";
+    const link = `vless://${uuid}@vpn.cephasgm.com:8443?security=tls&flow=xtls-rprx-vision&encryption=none&sni=vpn.cephasgm.com#CephasGM-Xray`;
+    res.json({ link });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
+
+// Xray config endpoint
+
+// Add this middleware before the /config endpoint
+const checkSubscription = async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      'SELECT subscription_status, subscription_end_date FROM users WHERE id = $1',
+      [req.userId]
+    );
+    const user = result.rows[0];
+    if (!user || user.subscription_status !== 'active') {
+      return res.status(403).json({ error: 'Active subscription required' });
+    }
+    if (user.subscription_end_date && new Date(user.subscription_end_date) < new Date()) {
+      return res.status(403).json({ error: 'Subscription expired' });
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Apply middleware to /config endpoint (uncomment the line below)
+// router.post('/config', checkSubscription, async (req, res, next) => {
+
+// Xray config endpoint (returns all protocols)

@@ -81,7 +81,6 @@ Use these accounts to test the service:
 |-------|----------|------|
 | `test@cephasgm.com` | `Test1234` | Premium (unlimited) |
 | `admin@cephasgm.com` | `Test1234` | Premium (unlimited) |
-| `cephasmkama@gmail.com` | `Test1234` | Premium (unlimited) |
 
 You can also create a new free user via the signup page – free accounts are limited to **5 Mbps**.
 
@@ -96,48 +95,6 @@ Use this card in Stripe Checkout (test mode):
 - **CVC:** any three digits
 
 After a successful payment, the user’s subscription status becomes `active` and the speed limit is removed.
-
----
-
-## 📂 Project Structure (Final)
-/home/ubuntu/CephasGM-VPN/
-├── static/ # Phase 3 – HTML files
-│ ├── index.html
-│ ├── signup.html
-│ ├── login.html
-│ ├── trial.html
-│ ├── subscription.html
-│ ├── payment.html
-│ └── dashboard.html
-├── pwa/ # Phase 3 – Built React PWA
-│ ├── index.html
-│ ├── manifest.json
-│ └── assets/
-├── backend/ # Phases 1,3,4,5 – Node.js API
-│ ├── .env
-│ ├── package.json
-│ ├── src/
-│ │ ├── index.js
-│ │ ├── config/db.js
-│ │ ├── models/ (User.js, Server.js)
-│ │ ├── services/
-│ │ │ ├── wireguard.js
-│ │ │ ├── stripe.js
-│ │ │ └── xray.js
-│ │ ├── middleware/ (auth.js, errorHandler.js)
-│ │ ├── routes/ (auth.js, vpn.js)
-│ │ └── utils/generate-client.sh
-│ └── node_modules/
-├── clients/ # Generated WireGuard client configs
-└── (other scripts and configs)
-
-/etc/nginx/sites-available/vpn # Nginx config (HTTPS, proxy, PWA)
-/etc/letsencrypt/live/vpn.cephasgm.com/ # SSL certificates
-/usr/local/etc/xray/config.json # Xray multi‑protocol config
-/etc/wireguard/wg0.conf # WireGuard server config
-/var/www/fake-blog/ # Fallback website (port 80)
-/usr/local/bin/apply-bandwidth-limit.sh # Traffic control script
-
 
 ---
 

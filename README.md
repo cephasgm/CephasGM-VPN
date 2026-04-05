@@ -185,4 +185,4 @@ This project is for educational and personal use. Please comply with all applica
 
 ---
 
-**Congratulations!** Your VPN platform is fully functional, anti‑censorship, and ready for production. 🎉
+⚠️ Disclaimer: This project is for research and educational purposes only. Users are responsible for complying with their local laws. I do not condone illegal activity.
